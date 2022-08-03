@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Development\\C#\\Nuclear\\NuclearGame\\NuclearGame.csproj": {}
+    "D:\\Development\\Fork\\Nuclear\\NuclearGame\\NuclearGame.csproj": {}
   },
   "projects": {
-    "D:\\Development\\C#\\Nuclear\\NuclearGame\\NuclearGame.csproj": {
+    "D:\\Development\\Fork\\Nuclear\\NuclearGame\\NuclearGame.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Development\\C#\\Nuclear\\NuclearGame\\NuclearGame.csproj",
+        "projectUniqueName": "D:\\Development\\Fork\\Nuclear\\NuclearGame\\NuclearGame.csproj",
         "projectName": "NuclearGame",
-        "projectPath": "D:\\Development\\C#\\Nuclear\\NuclearGame\\NuclearGame.csproj",
+        "projectPath": "D:\\Development\\Fork\\Nuclear\\NuclearGame\\NuclearGame.csproj",
         "packagesPath": "C:\\Users\\Reece\\.nuget\\packages\\",
-        "outputPath": "D:\\Development\\C#\\Nuclear\\NuclearGame\\obj\\",
+        "outputPath": "D:\\Development\\Fork\\Nuclear\\NuclearGame\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Reece\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -38,17 +38,37 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
-            "AssimpNet": {
+            "Entitas": {
               "target": "Package",
-              "version": "[4.1.0, )"
+              "version": "[1.13.0, )"
             },
-            "OpenTK": {
+            "Veldrid": {
               "target": "Package",
-              "version": "[4.7.4, )"
+              "version": "[4.8.0, )"
             },
-            "SixLabors.ImageSharp": {
+            "Veldrid.ImageSharp": {
               "target": "Package",
-              "version": "[2.1.3, )"
+              "version": "[4.8.0, )"
+            },
+            "Veldrid.MetalBindings": {
+              "target": "Package",
+              "version": "[4.8.0, )"
+            },
+            "Veldrid.OpenGLBindings": {
+              "target": "Package",
+              "version": "[4.8.0, )"
+            },
+            "Veldrid.SDL2": {
+              "target": "Package",
+              "version": "[4.8.0, )"
+            },
+            "Veldrid.SPIRV": {
+              "target": "Package",
+              "version": "[1.0.15, )"
+            },
+            "Veldrid.StartupUtilities": {
+              "target": "Package",
+              "version": "[4.8.0, )"
             }
           },
           "imports": [

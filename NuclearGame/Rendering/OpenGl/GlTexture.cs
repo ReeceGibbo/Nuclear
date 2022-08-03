@@ -1,16 +1,8 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using System.Drawing;
-using System.Drawing.Imaging;
-using Assimp;
-using NuclearGame.Components.Data;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using TextureWrapMode = OpenTK.Graphics.OpenGL4.TextureWrapMode;
-
-namespace NuclearGame.Rendering.OpenGl;
+﻿namespace NuclearGame.Rendering.OpenGl;
 
 public class GlTexture
 {
+    /*
     private readonly int Handle;
 
     public GlTexture(TextureData data)
@@ -45,4 +37,5 @@ public class GlTexture
         GL.ActiveTexture(unit);
         GL.BindTexture(TextureTarget.Texture2D, Handle);
     }
+    */
 }

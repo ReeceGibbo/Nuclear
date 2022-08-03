@@ -1,186 +1,102 @@
-﻿using Assimp;
-using NuclearGame.Components;
-using NuclearGame.Rendering;
-using NuclearGame.Rendering.OpenGl;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using Camera = NuclearGame.Components.Camera;
-using Material = NuclearGame.Components.Material;
-using Mesh = NuclearGame.Components.Mesh;
+﻿using System.Text;
+using NuclearGame.Utils;
+using SharpDX.DXGI;
+using Veldrid;
+using Veldrid.Sdl2;
+using Veldrid.SPIRV;
 
 namespace NuclearGame;
 
 public class Game
 {
 
-    private readonly GameWindow _window;
+    private readonly Sdl2Window _window;
+    private readonly GraphicsDevice _graphicsDevice;
 
-    private RenderPipeline RenderPipeline;
+    private CommandList _commandList;
 
-    private Transform cameraTransform;
-    private Camera camera;
-
-    private Transform modelTransform;
-    private int modelIndex;
-
-    private Transform modelTransform2;
-    private int modelIndex2;
-
-    public Game(GameWindow gameWindow)
+    public Game(Sdl2Window window, GraphicsDevice graphicsDevice)
     {
-        _window = gameWindow;
+        _window = window;
+        _graphicsDevice = graphicsDevice;
+
+        Util.UseReverseDepth = graphicsDevice.IsDepthRangeZeroToOne;
+        Util.IsClipSpaceYInverted = graphicsDevice.IsClipSpaceYInverted;
     }
 
-    public void Load()
+    public void Create()
     {
-        var normalShader = new GlShader("shaders/basic.vert", "shaders/basic.frag");
-        normalShader.SetInt("diffuseTexture", 0);
-        
-        RenderPipeline = new OpenGlRenderPipeline(_window.Size.X, _window.Size.Y);
+        var factory = _graphicsDevice.ResourceFactory;
 
-        cameraTransform = new Transform
-        {
-            Position = new Vector3(0, 0, 0),
-            EulerAngles = new Vector3(0, 0, 0),
-            Scale = new Vector3(1, 1, 1)
-        };
-        
-        camera = new Camera
-        {
-            FieldOfView = 65f
-        };
-        RenderPipeline.SetMainCamera(cameraTransform, camera);
-        
-        var assimp = new AssimpContext();
-        LoadModel1(assimp);
-        LoadModel2(assimp);
+        _commandList = factory.CreateCommandList();
+
+        var vertexLayout = new VertexLayoutDescription(
+            new VertexElementDescription("aPosition", VertexElementSemantic.Position, VertexElementFormat.Float3), 
+            new VertexElementDescription("aTexCoord", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2), 
+            new VertexElementDescription("aNormals", VertexElementSemantic.Normal, VertexElementFormat.Float3)
+        );
+
+        var vertexResources = factory.CreateResourceLayout(new ResourceLayoutDescription(
+            new ResourceLayoutElementDescription("model", ResourceKind.UniformBuffer, ShaderStages.Vertex),
+            new ResourceLayoutElementDescription("view", ResourceKind.UniformBuffer, ShaderStages.Vertex),
+            new ResourceLayoutElementDescription("projection", ResourceKind.UniformBuffer, ShaderStages.Vertex)
+        ));
+
+        var fragmentResources = factory.CreateResourceLayout(new ResourceLayoutDescription(
+            new ResourceLayoutElementDescription("diffuseTexture", ResourceKind.TextureReadWrite, ShaderStages.Fragment),
+            new ResourceLayoutElementDescription("diffuseSampler", ResourceKind.Sampler, ShaderStages.Fragment)
+        ));
+
+        var shaderSet = new ShaderSetDescription(
+            new [] { vertexLayout }, 
+            factory.CreateFromSpirv(
+                new ShaderDescription(ShaderStages.Vertex, Encoding.UTF8.GetBytes(File.ReadAllText(Assets.GetPath("basic.vert"))), "main"), 
+                new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(File.ReadAllText(Assets.GetPath("basic.frag"))), "main")
+                )
+        );
+
+        var pipeline = factory.CreateGraphicsPipeline(new GraphicsPipelineDescription(
+            BlendStateDescription.SingleOverrideBlend,
+            DepthStencilStateDescription.DepthOnlyLessEqual,
+            RasterizerStateDescription.Default,
+            PrimitiveTopology.TriangleList,
+            shaderSet,
+            new [] { vertexResources, fragmentResources },
+            _graphicsDevice.SwapchainFramebuffer.OutputDescription
+        ));
     }
 
-    private void LoadModel1(AssimpContext assimp)
+    public void Render()
     {
-        modelTransform = new Transform
-        {
-            Position = new Vector3(0, -4, -15),
-            EulerAngles = new Vector3(0, 0, 0),
-            Scale = new Vector3(1f, 1f, 1f)
-        };
-        
-        var mesh = new Mesh
-        {
-            Path = "Models/constructor-sketchfab.obj"
-        };
-        mesh.LoadMesh(assimp);
+        _commandList.Begin();
+        _commandList.SetFramebuffer(_graphicsDevice.SwapchainFramebuffer);
+        _commandList.ClearColorTarget(0, RgbaFloat.Blue);
+        _commandList.End();
 
-        var material = new Material
-        {
-            shader = "basic",
-            diffuseTexture = "Models/textures/constructor-sketchfab.png"
-        };
-        material.LoadTexture();
-
-        modelIndex = RenderPipeline.GenerateMesh(mesh, material);
-    }
-    
-    private void LoadModel2(AssimpContext assimp)
-    {
-        modelTransform2 = new Transform
-        {
-            Position = new Vector3(-10, -4, -15),
-            EulerAngles = new Vector3(0, 0, 0),
-            Scale = new Vector3(1f, 1f, 1f)
-        };
-        
-        var mesh = new Mesh
-        {
-            Path = "Models/DonutThing/donut.obj"
-        };
-        mesh.LoadMesh(assimp);
-
-        var material = new Material
-        {
-            shader = "basic",
-            diffuseTexture = "Models/DonutThing/wood.png"
-        };
-        material.LoadTexture();
-
-        modelIndex2 = RenderPipeline.GenerateMesh(mesh, material);
-    }
-    
-    public void Render(FrameEventArgs e)
-    {
-        RenderPipeline.StartRender();
-        RenderPipeline.RenderMesh(modelTransform, modelIndex);
-        RenderPipeline.RenderMesh(modelTransform2, modelIndex2);
-        RenderPipeline.StopRender();
+        _graphicsDevice.SubmitCommands(_commandList);
+        _graphicsDevice.SwapBuffers();
     }
 
-    public void Update(FrameEventArgs e, KeyboardState keyboardState, MouseState mouseState)
+    public void Update()
     {
-        var speed = 0.1f;
-        var position = cameraTransform.Position;
-
-        var movement = new Vector3(0, 0, 0);
-                
-        if (keyboardState.IsKeyDown(Keys.W))
-        {
-            movement.Z = 1;
-        }
-        if (keyboardState.IsKeyDown(Keys.S))
-        {
-            movement.Z = -1;
-        }
-        if (keyboardState.IsKeyDown(Keys.A))
-        {
-            movement.X = 1;
-        }
-        if (keyboardState.IsKeyDown(Keys.D))
-        {
-            movement.X = -1;
-        }
         
-        var upDown = 0f;
-        if (keyboardState.IsKeyDown(Keys.Space))
-        {
-            upDown -= speed;
-        }
-
-        if (keyboardState.IsKeyDown(Keys.LeftShift))
-        {
-            upDown += speed;
-        }
-
-        cameraTransform.Position = position + (movement * speed) + new Vector3(0, upDown, 0);;
-        
-        // Rotation Movement
-        var eulerAngles = cameraTransform.EulerAngles;
-        eulerAngles.X += 0.01f * (mouseState.Y - mouseState.PreviousY);
-        eulerAngles.Y += 0.01f * (mouseState.X - mouseState.PreviousX);
-        eulerAngles.Z = 0f;
-
-        cameraTransform.EulerAngles = eulerAngles;
-        
-        RenderPipeline.UpdateMainCameraTransform(cameraTransform);
     }
 
-    public void Resize(ResizeEventArgs e)
+    public void Resize()
     {
-        GL.Viewport(0, 0, e.Width, e.Height);
-        RenderPipeline.Resize(e.Width, e.Height);
+        var width = (uint)_window.Width;
+        var height = (uint)_window.Height;
+
+        _graphicsDevice.ResizeMainWindow(width, height);
     }
 
-    public void EditorResize(int width, int height)
+    public void EditorResize(uint width, uint height)
     {
-        RenderPipeline.Resize(width, height);
+        _graphicsDevice.ResizeMainWindow(width, height);
     }
 
     public void Destroy()
     {
-        // Unbind all the resources by binding the targets to 0/null.
-        GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-        GL.BindVertexArray(0);
-        GL.UseProgram(0);
+        
     }
 }

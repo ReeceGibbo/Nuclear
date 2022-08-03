@@ -1,16 +1,13 @@
-﻿using Assimp;
-using NuclearGame.Components;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using NuclearGame.Components;
 using Camera = NuclearGame.Components.Camera;
 using Material = NuclearGame.Components.Material;
 using Mesh = NuclearGame.Components.Mesh;
-using PrimitiveType = OpenTK.Graphics.OpenGL4.PrimitiveType;
 
 namespace NuclearGame.Rendering.OpenGl;
 
-public class OpenGlRenderPipeline : RenderPipeline
+public class OpenGlRenderPipeline
 {
+    /*
     private readonly List<GlRenderableObject> GlRenderObjects;
     private readonly GlShader Shader;
 
@@ -102,5 +99,5 @@ public class OpenGlRenderPipeline : RenderPipeline
 
         Camera.Resize(Width, Height, comCamera);
     }
-    
+    */
 }

@@ -1,32 +1,44 @@
-﻿using Assimp;
-using NuclearGame.Components.Data;
-using OpenTK.Mathematics;
+﻿using NuclearGame.Components.Data;
+using Veldrid;
 
 namespace NuclearGame.Components;
 
 public struct Mesh
 {
     public string Path;
-    private MeshData MeshData;
+    private string _loadedPath;
+    
+    private bool _init;
+    private DeviceBuffer _vertexBuffer;
+    private DeviceBuffer _indexBuffer;
 
-    public void LoadMesh(AssimpContext assimpContext)
+    private void LoadMesh(GraphicsDevice device, MeshData meshData)
     {
-        MeshData = new MeshData();
-        var scene = assimpContext.ImportFile(Path, PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.OptimizeMeshes);
-        var sceneMesh = scene.Meshes[0];
+        var factory = device.ResourceFactory;
         
-        var vertices = sceneMesh.Vertices.Select(vector => new Vector3(vector.X, vector.Y, vector.Z)).ToArray();
-        var normals = sceneMesh.Normals.Select(vector => new Vector3(vector.X, vector.Y, vector.Z)).ToArray();
-        var uvs = sceneMesh.TextureCoordinateChannels[0].Select(vector => new Vector2(vector.X, vector.Y)).ToArray();
+        _vertexBuffer =
+            factory.CreateBuffer(new BufferDescription(meshData.GetVertexBufferSize(), BufferUsage.VertexBuffer));
+        _indexBuffer =
+            factory.CreateBuffer(new BufferDescription(meshData.GetIndexBufferSize(), BufferUsage.IndexBuffer));
 
-        MeshData.Vertices = vertices;
-        MeshData.Normals = normals;
-        MeshData.Uvs = uvs;
-        MeshData.Indices = sceneMesh.GetUnsignedIndices();
+        device.UpdateBuffer(_vertexBuffer, 0, meshData.GetVertexBufferData());
+        device.UpdateBuffer(_indexBuffer, 0, meshData.Indices);
     }
 
-    public MeshData GetMeshData()
+    private bool HasInit()
     {
-        return MeshData;
+        return _init;
     }
+
+    private bool HasPathChanged()
+    {
+        if (Path != _loadedPath)
+        {
+            _init = false;
+            return true;
+        }
+
+        return false;
+    }
+    
 }

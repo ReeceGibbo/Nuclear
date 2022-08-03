@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NuclearGame\NuclearGame.csproj" />
+      <PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="OpenTK.ImGui" Version="1.0.0" />
+      <ProjectReference Include="..\NuclearGame\NuclearGame.csproj" />
     </ItemGroup>
 
 </Project>

@@ -16,7 +16,7 @@ public struct Material
     {
         var image = Image.Load<Rgba32>(diffuseTexture);
 
-        if (image.DangerousTryGetSinglePixelMemory(out var pixelSpan))
+        if (image.TryGetSinglePixelSpan(out var pixelSpan))
         {
             TextureData = new TextureData
             {

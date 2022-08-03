@@ -1,108 +1,68 @@
-﻿using System.Numerics;
-using ImGuiNET;
-using NuclearGame;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.ImGui;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using Vector2 = System.Numerics.Vector2;
+﻿using ImGuiNET;
+using NuclearGame.Input;
+using Veldrid;
+using Veldrid.Sdl2;
 
 namespace NuclearEditor;
 
 public class Editor
 {
+    private readonly Sdl2Window _window;
+    private readonly GraphicsDevice _graphicsDevice;
 
-    private GameWindow _window;
-    private Game _game;
+    private CommandList _commandList;
     
-    private ImGuiController _controller;
-    private OpenGlFramebuffer? gameFramebuffer;
-
-    private Vector2 viewportPanelSize;
-
-    public Editor(GameWindow gameWindow)
+    // Editor
+    //private Game _game;
+    
+    private ImGuiRenderer _imGuiRenderer;
+    
+    public Editor(Sdl2Window window, GraphicsDevice graphicsDevice)
     {
-        _window = gameWindow;
+        _window = window;
+        _graphicsDevice = graphicsDevice;
     }
     
-    public void Load()
+    public void Create()
     {
-        _controller = new ImGuiController(_window.Size.X, _window.Size.Y);
-
-        gameFramebuffer = new OpenGlFramebuffer(800, 800);
-        gameFramebuffer.Generate();
+        _imGuiRenderer = new ImGuiRenderer(_graphicsDevice, _graphicsDevice.SwapchainFramebuffer.OutputDescription, 
+            _window.Width, _window.Height);
         
-        gameFramebuffer.Bind();
-        _game = new Game(_window);
-        _game.Load();
-        gameFramebuffer.Unbind();
+        var factory = _graphicsDevice.ResourceFactory;
+        _commandList = factory.CreateCommandList();
     }
-
-    private int counter = 0;
-    private double frameTime = 0d;
     
-    public void Render(FrameEventArgs e)
+    public void Render()
     {
-        counter++;
-        if (counter == 100)
-        {
-            frameTime = e.Time;
-            counter = 0;
-        }
-
-        _controller.Update(_window, (float)e.Time);
-
-        gameFramebuffer.Bind();
-        _game.Render(e);
-        gameFramebuffer.Unbind();
-
-        GL.Viewport(0, 0, _window.Size.X, _window.Size.Y);
-        GL.ClearColor(new Color4(0, 32, 48, 255));
-        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
-
-        ImGui.Begin("Viewport");
-        var panelSize = ImGui.GetContentRegionAvail();
-        if (viewportPanelSize != panelSize)
-        {
-            gameFramebuffer.Resize((int) panelSize.X, (int) panelSize.Y);
-            _game.EditorResize((int)panelSize.X, (int)panelSize.Y);
-            viewportPanelSize = panelSize;
-        }
-        ImGui.Image(gameFramebuffer.GetColorAttachment(), viewportPanelSize, new Vector2(0, 1), new Vector2(1, 0));
-        ImGui.End();
-
-        ImGui.Begin("Render Stats");
-        ImGui.Text($"MS: {frameTime * 1000f}");
-        ImGui.End();
-        
         ImGui.ShowDemoWindow();
-        _controller.Render();
+        
+        _commandList.Begin();
+        _commandList.SetFramebuffer(_graphicsDevice.SwapchainFramebuffer);
+        _commandList.ClearColorTarget(0, RgbaFloat.LightGrey);
+        _imGuiRenderer.Render(_graphicsDevice, _commandList);
+        _commandList.End();
+
+        _graphicsDevice.SubmitCommands(_commandList);
+        _graphicsDevice.SwapBuffers();
     }
 
-    public void Update(FrameEventArgs e)
+    public void Update(float delta)
     {
+        _imGuiRenderer.Update(delta, InputTracker.FrameSnapshot);
     }
 
-    public void Resize(ResizeEventArgs e)
+    public void Resize()
     {
-        GL.Viewport(0, 0, e.Width, e.Height);
-        _controller.WindowResized(e.Width, e.Height);
+        var width = _window.Width;
+        var height = _window.Height;
+
+        _graphicsDevice.ResizeMainWindow((uint) width, (uint) height);
+        _imGuiRenderer.WindowResized(width, height);
     }
     
     public void Destroy()
     {
-        _controller.Dispose();
-        _game.Destroy();
-    }
-
-    public void TextInput(TextInputEventArgs e)
-    {
-        _controller.PressChar((char)e.Unicode);
-    }
-
-    public void MouseWheel(MouseWheelEventArgs e)
-    {
-        _controller.MouseScroll(e.Offset);
+        _imGuiRenderer.Dispose();
+        _graphicsDevice.Dispose();
     }
 }
