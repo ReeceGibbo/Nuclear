@@ -14,7 +14,7 @@ public struct Camera
     private Matrix4x4 _viewMatrix;
     private Matrix4x4 _projectionMatrix;
     
-    private void InitCamera(int width, int height, ref Transform transform)
+    public void InitCamera(int width, int height, ref Transform transform)
     {
         UpdateProjectionMatrix(width, height);
         UpdateViewMatrix(ref transform);
@@ -26,7 +26,7 @@ public struct Camera
         var lookRotation = Quaternion.CreateFromYawPitchRoll(0f, 0f, 0f);
         var lookDir = Vector3.Transform(-Vector3.UnitZ, lookRotation);
 
-        _viewMatrix = Matrix4x4.CreateLookAt(transform.Position, transform.Position + lookDir, Vector3.UnitY);
+        _viewMatrix = Matrix4x4.CreateTranslation(transform.Position);
     }
     
     public void UpdateProjectionMatrix(int width, int height)

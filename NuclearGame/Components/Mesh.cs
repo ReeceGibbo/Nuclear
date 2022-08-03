@@ -9,10 +9,11 @@ public struct Mesh
     private string _loadedPath;
     
     private bool _init;
+    private uint _indexCount;
     private DeviceBuffer _vertexBuffer;
     private DeviceBuffer _indexBuffer;
 
-    private void LoadMesh(GraphicsDevice device, MeshData meshData)
+    public void LoadMesh(GraphicsDevice device, MeshData meshData)
     {
         var factory = device.ResourceFactory;
         
@@ -23,6 +24,8 @@ public struct Mesh
 
         device.UpdateBuffer(_vertexBuffer, 0, meshData.GetVertexBufferData());
         device.UpdateBuffer(_indexBuffer, 0, meshData.Indices);
+
+        _indexCount = (uint) meshData.Indices.Length;
     }
 
     private bool HasInit()
@@ -39,6 +42,21 @@ public struct Mesh
         }
 
         return false;
+    }
+
+    public DeviceBuffer GetVertexBuffer()
+    {
+        return _vertexBuffer;
+    }
+
+    public DeviceBuffer GetIndexBuffer()
+    {
+        return _indexBuffer;
+    }
+
+    public uint GetIndexCount()
+    {
+        return _indexCount;
     }
     
 }

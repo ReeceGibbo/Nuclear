@@ -18,7 +18,7 @@ public class GameWrapper
         };
 
         var graphicsDeviceOptions =
-            new GraphicsDeviceOptions(false, null, false,
+            new GraphicsDeviceOptions(false, PixelFormat.R16_UNorm, false,
                 ResourceBindingModel.Improved, true, true, true);
 
 #if DEBUG

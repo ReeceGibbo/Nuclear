@@ -2,6 +2,39 @@
   "version": 3,
   "targets": {
     "net6.0": {
+      "AssimpNet/4.1.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
+        },
+        "compile": {
+          "lib/netstandard1.3/AssimpNet.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/AssimpNet.dll": {}
+        },
+        "build": {
+          "build/AssimpNet.targets": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libassimp.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-x64/native/libassimp.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/assimp.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/assimp.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
       "Entitas/1.13.0": {
         "type": "package",
         "compile": {
@@ -2551,6 +2584,31 @@
     }
   },
   "libraries": {
+    "AssimpNet/4.1.0": {
+      "sha512": "z/4Tmf3Q2r1+vN6o/szArEZvPsdYNRYiS0L/yArybQd7n7KCiS9L4lRZhwwlHJb/edECM+Jky0XisVspr5aQWQ==",
+      "type": "package",
+      "path": "assimpnet/4.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "AssimpNet Documentation (October 2018).chm",
+        "ChangeLog.txt",
+        "License.txt",
+        "assimpnet.4.1.0.nupkg.sha512",
+        "assimpnet.nuspec",
+        "build/AssimpNet.targets",
+        "lib/net35/AssimpNet.dll",
+        "lib/net35/AssimpNet.xml",
+        "lib/net40/AssimpNet.dll",
+        "lib/net40/AssimpNet.xml",
+        "lib/netstandard1.3/AssimpNet.dll",
+        "lib/netstandard1.3/AssimpNet.xml",
+        "runtimes/linux-x64/native/libassimp.so",
+        "runtimes/osx-x64/native/libassimp.dylib",
+        "runtimes/win-x64/native/assimp.dll",
+        "runtimes/win-x86/native/assimp.dll"
+      ]
+    },
     "Entitas/1.13.0": {
       "sha512": "/tfX/+INhcniQ7h6Dw4RoNNJZM0xQDPeyfJqkizA8HXQPPz8a2NnXvQZq0Wxuetc+wknurWxr7z7Zm3eVH/o6w==",
       "type": "package",
@@ -8023,6 +8081,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "AssimpNet >= 4.1.0",
       "Entitas >= 1.13.0",
       "Veldrid >= 4.8.0",
       "Veldrid.ImageSharp >= 4.8.0",
@@ -8070,6 +8129,10 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "AssimpNet": {
+            "target": "Package",
+            "version": "[4.1.0, )"
+          },
           "Entitas": {
             "target": "Package",
             "version": "[1.13.0, )"

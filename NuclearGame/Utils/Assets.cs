@@ -2,7 +2,7 @@
 
 internal static class Assets
 {
-    private static readonly string SAssetRoot = Path.Combine(AppContext.BaseDirectory, "Shaders");
+    private static readonly string SAssetRoot = Path.Combine(AppContext.BaseDirectory, "Assets");
 
     internal static string GetPath(string assetPath)
     {

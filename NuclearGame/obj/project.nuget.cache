@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "d1tYKgVPVUlMoflL6RkRg6sFGdFOxgYTN0lzjpIU9m8WiDka/puBeYKgPm4P4mvSZ3N7WGcwIt6yO3L6fIy23g==",
+  "dgSpecHash": "LhwP4S08PG+X3i6snp2+aWN/IGlxkT6/VNNP9zePKjoI3h5u8ZF9WT6YN32b/QiI/f/J0/da6LkpwGErjuLcgw==",
   "success": true,
   "projectFilePath": "D:\\Development\\Fork\\Nuclear\\NuclearGame\\NuclearGame.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Reece\\.nuget\\packages\\assimpnet\\4.1.0\\assimpnet.4.1.0.nupkg.sha512",
     "C:\\Users\\Reece\\.nuget\\packages\\entitas\\1.13.0\\entitas.1.13.0.nupkg.sha512",
     "C:\\Users\\Reece\\.nuget\\packages\\libuv\\1.9.1\\libuv.1.9.1.nupkg.sha512",
     "C:\\Users\\Reece\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\1.1.0\\microsoft.codeanalysis.analyzers.1.1.0.nupkg.sha512",
